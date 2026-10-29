@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ultron System Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="../vendor/chart.umd.js"></script>
+</head>
+<body>
+  <div class="dashboard-wrapper">
+    <!-- Header -->
+    <header>
+      <div class="logo-area">
+        <div class="logo-symbol">&Delta;</div>
+        <div>
+          <h1>ULTRON TELEMETRY</h1>
+          <div style="font-size: 11px; color: #5588aa;">SYSTEM USAGE & VOICE CONTROL MATRIX</div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="badge" id="system-status-badge">ONLINE</span>
+        <button class="btn-cyber" id="btn-refresh">REFRESH</button>
+        <button class="btn-cyber" id="btn-toggle-autostart">BOOT AUTO-START: ON</button>
+      </div>
+    </header>
+
+    <!-- Top Summary Metrics -->
+    <section class="summary-cards">
+      <div class="metric-card">
+        <div class="metric-title">TODAY'S SCREEN TIME</div>
+        <div class="metric-value" id="val-daily-time">0.0h</div>
+        <div class="metric-sub" id="sub-daily-time">0 mins tracked</div>
+      </div>
+      <div class="metric-card green">
+        <div class="metric-title">MONTHLY SCREEN TIME</div>
+        <div class="metric-value" id="val-monthly-time">0.0h</div>
+        <div class="metric-sub" id="sub-monthly-time">Current month aggregate</div>
+      </div>
+      <div class="metric-card amber">
+        <div class="metric-title">TODAY'S NETWORK USAGE</div>
+        <div class="metric-value" id="val-daily-data">0.0 MB</div>
+        <div class="metric-sub" id="sub-daily-data">Estimated foreground I/O</div>
+      </div>
+      <div class="metric-card purple" id="card-apps-summary" style="cursor: pointer;" title="Click to view & add application aliases">
+        <div class="metric-title">APP SHORTCUTS</div>
+        <div class="metric-value" id="val-apps-count">--</div>
+        <div class="metric-sub">Voice-ready applications (+ Add New)</div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-bar">
+      <div class="tab-item active" data-tab="tab-screen">SCREEN TIME</div>
+      <div class="tab-item" data-tab="tab-data">NETWORK USAGE</div>
+      <div class="tab-item" data-tab="tab-commands">COMMAND HISTORY</div>
+      <div class="tab-item" data-tab="tab-aliases">APP ALIASES</div>
+      <div class="tab-item" data-tab="tab-ai">AI BRAIN & INTELLIGENCE</div>
+    </nav>
+
+    <!-- TAB 1: SCREEN TIME -->
+    <div id="tab-screen" class="tab-content">
+      <div class="charts-grid">
+        <div class="chart-panel">
+          <div class="panel-header">
+            <span class="panel-title">TOP APPLICATIONS TODAY</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-daily-apps"></canvas>
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-header">
+            <span class="panel-title">MONTHLY DAILY TREND</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-monthly-trend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-panel">
+        <div class="panel-header">
+          <span class="panel-title">APPLICATION SESSIONS TODAY</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>APPLICATION</th>
+              <th>ACTIVE TIME</th>
+              <th>ESTIMATED I/O</th>
+              <th>SHARE</th>
+            </tr>
+          </thead>
+          <tbody id="table-daily-apps">
+            <tr><td colspan="4" style="text-align:center; color:#5588aa;">Gathering telemetry...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: NETWORK DATA USAGE -->
+    <div id="tab-data" class="tab-content" style="display: none;">
+      <div class="charts-grid">
+        <div class="chart-panel">
+          <div class="panel-header">
+            <span class="panel-title">DAILY DATA DISTRIBUTION</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-data-daily"></canvas>
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-header">
+            <span class="panel-title">MONTHLY DATA SUMMARY</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="chart-data-monthly"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: COMMAND HISTORY -->
+    <div id="tab-commands" class="tab-content" style="display: none;">
+      <div class="table-panel">
+        <div class="panel-header">
+          <span class="panel-title">RECENT VOICE & TEXT COMMANDS</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>TIMESTAMP</th>
+              <th>COMMAND SPOKEN</th>
+              <th>TYPE</th>
+              <th>STATUS</th>
+              <th>EXECUTION DETAILS</th>
+            </tr>
+          </thead>
+          <tbody id="table-commands">
+            <tr><td colspan="5" style="text-align:center; color:#5588aa;">No commands logged yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: APP ALIASES -->
+    <div id="tab-aliases" class="tab-content" style="display: none;">
+      
+      <!-- ADD CUSTOM APPLICATION PANEL -->
+      <div class="table-panel" style="border: 1px solid rgba(0, 255, 136, 0.35); box-shadow: 0 0 20px rgba(0, 255, 136, 0.08); margin-bottom: 24px;">
+        <div class="panel-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="display: inline-block; width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88;"></span>
+            <span class="panel-title" style="color: #00ff88; font-size: 14px;">REGISTER NEW APPLICATION / CUSTOM VOICE ALIAS</span>
+          </div>
+          <span style="font-size: 11px; color: #6482a0; letter-spacing: 1px;">VOICE ENGINE REGISTRY</span>
+        </div>
+        
+        <p style="font-size: 12px; color: #88aacc; margin-bottom: 16px; line-height: 1.5;">
+          Browse any application (<span style="color:#00f0ff;">.exe</span>), shortcut (<span style="color:#00f0ff;">.lnk</span>), or script (<span style="color:#00f0ff;">.bat / .cmd</span>) from your PC and assign a spoken name. Once added, say <span style="color:#00ff88; font-weight: bold;">"Hey Ultron, open &lt;name&gt;"</span> or <span style="color:#00ff88; font-weight: bold;">"Hey Ultron, open &lt;name&gt; for me"</span> to launch it instantly!
+        </p>
+
+        <form id="form-add-app" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: grid; grid-template-columns: 1fr 1.6fr auto; gap: 12px; align-items: end;">
+            <div>
+              <label for="input-app-name" style="display: block; font-size: 11px; color: #6482a0; margin-bottom: 6px; letter-spacing: 1px;">
+                SPOKEN APPLICATION NAME / ALIAS
+              </label>
+              <input type="text" id="input-app-name" placeholder="e.g. blender, gta v, fl studio" autocomplete="off"
+                     style="width: 100%; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 13px;">
+            </div>
+
+            <div>
+              <label for="input-app-path" style="display: block; font-size: 11px; color: #6482a0; margin-bottom: 6px; letter-spacing: 1px;">
+                APPLICATION / EXECUTABLE PATH
+              </label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="input-app-path" placeholder="Click Browse to select from PC or enter path..." autocomplete="off"
+                       style="flex: 1; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 12px;">
+                <button type="button" class="btn-cyber" id="btn-browse-app" style="white-space: nowrap; padding: 9px 16px; background: rgba(0, 240, 255, 0.15); border-color: #00f0ff;">
+                  📁 BROWSE PC
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <button type="submit" class="btn-cyber green" id="btn-add-app" style="padding: 9px 20px; font-weight: bold; white-space: nowrap; height: 38px;">
+                + ADD APP
+              </button>
+            </div>
+          </div>
+
+          <!-- Feedback notification toast -->
+          <div id="add-app-feedback" style="display: none; padding: 10px 14px; border-radius: 4px; font-size: 12px; letter-spacing: 0.5px;"></div>
+        </form>
+      </div>
+
+      <!-- ALIASES LIST PANEL -->
+      <div class="table-panel">
+        <div class="panel-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="panel-title">REGISTERED APPLICATION ALIASES</span>
+            <span id="aliases-count-badge" class="badge" style="font-size: 11px;">0 TOTAL</span>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-cyber" id="btn-filter-custom" style="padding: 5px 12px; font-size: 11px;">SHOW CUSTOM ONLY</button>
+            <button class="btn-cyber" id="btn-rescan-apps" style="padding: 5px 12px; font-size: 11px;">RE-SCAN START MENU</button>
+          </div>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <input type="text" id="alias-search" placeholder="Search applications (e.g. chrome, valorant, notepad, blender)..." 
+                 style="width: 100%; padding: 8px 12px; background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px;">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 22%;">SPOKEN ALIAS</th>
+              <th style="width: 12%;">SOURCE</th>
+              <th style="width: 50%;">EXECUTABLE / SHORTCUT PATH</th>
+              <th style="width: 16%; text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="table-aliases">
+            <tr><td colspan="4" style="text-align:center; color:#5588aa;">Loading aliases...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: AI BRAIN & INTELLIGENCE -->
+    <div id="tab-ai" class="tab-content" style="display: none;">
+      
+      <!-- AI Configuration Grid -->
+      <div class="charts-grid" style="margin-bottom: 24px;">
+        
+        <!-- Panel 1: AI Provider & Engine Settings -->
+        <div class="table-panel" style="border: 1px solid rgba(0, 240, 255, 0.35); box-shadow: 0 0 20px rgba(0, 240, 255, 0.08);">
+          <div class="panel-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="display: inline-block; width: 8px; height: 8px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff;"></span>
+              <span class="panel-title" style="color: #00f0ff; font-size: 14px;">NEURAL REASONING ENGINE</span>
+            </div>
+            <span class="badge" id="ai-active-provider-badge">HYBRID (ZERO-KEY)</span>
+          </div>
+
+          <form id="form-ai-config" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label for="select-ai-provider" style="display: block; font-size: 11px; color: #6482a0; margin-bottom: 6px; letter-spacing: 1px;">
+                  AI PROVIDER
+                </label>
+                <select id="select-ai-provider" style="width: 100%; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 12px;">
+                  <option value="hybrid">Zero-Key Smart Brain (Weather, Wiki, Math - No Key)</option>
+                  <option value="groq">Groq (Blazing Fast, Free Tier - GPT-OSS 120B / Qwen)</option>
+                  <option value="gemini">Google Gemini (Free Flash Tier - 3.6 / Flash)</option>
+                  <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+                  <option value="ollama">Ollama (100% Offline Local Model)</option>
+                  <option value="openrouter">OpenRouter (Multi-model / Free endpoints)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="input-ai-model" style="display: block; font-size: 11px; color: #6482a0; margin-bottom: 6px; letter-spacing: 1px;">
+                  MODEL IDENTIFIER
+                </label>
+                <input type="text" id="input-ai-model" placeholder="e.g. openai/gpt-oss-120b, gemini-3.6-flash, gpt-4o-mini"
+                       style="width: 100%; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 12px;">
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label for="input-ai-key" style="font-size: 11px; color: #6482a0; letter-spacing: 1px;">
+                  API KEY (PERSISTENTLY SAVED TO .ENV & CONFIG)
+                </label>
+                <span id="ai-key-status-badge" style="font-size: 10px; padding: 2px 8px; border-radius: 3px; background: rgba(0, 240, 255, 0.1); color: #00f0ff;">
+                  CHECKING...
+                </span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <input type="password" id="input-ai-key" placeholder="Enter API key (e.g. AIza... or gsk_...)" autocomplete="off"
+                       style="flex: 1; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 12px;">
+                <button type="button" class="btn-cyber" id="btn-toggle-key-visibility" style="padding: 9px 14px;">👁 SHOW</button>
+                <button type="button" class="btn-cyber danger" id="btn-remove-api-key" style="padding: 9px 14px; display: none;" title="Remove saved API key">🗑 CLEAR</button>
+              </div>
+              <div id="ai-key-help-text" style="font-size: 11px; color: #88aacc; margin-top: 5px; line-height: 1.4;"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label for="select-talkative-mode" style="display: block; font-size: 11px; color: #6482a0; margin-bottom: 6px; letter-spacing: 1px;">
+                  TALKATIVE CONVERSATIONAL MODE
+                </label>
+                <select id="select-talkative-mode" style="width: 100%; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 12px;">
+                  <option value="true">Talkative & Conversational (Explains freely, rich depth)</option>
+                  <option value="false">Concise & Sharp (1-2 sentence executive briefings)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="select-persona" style="display: block; font-size: 11px; color: #6482a0; margin-bottom: 6px; letter-spacing: 1px;">
+                  PERSONA & VOICE TONE
+                </label>
+                <select id="select-persona" style="width: 100%; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 12px;">
+                  <option value="ultron">Movie Ultron (James Spader - Commanding, Witty, Loyal)</option>
+                  <option value="jarvis">Jarvis (Polite & Sophisticated British Assistant)</option>
+                  <option value="cyber">Cyberpunk Overlord (Direct, Tactical, Analytical)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn-cyber" id="btn-test-ai-conn">⚡ TEST CONNECTION</button>
+                <button type="button" class="btn-cyber" id="btn-clear-ai-memory">🧹 CLEAR MEMORY</button>
+              </div>
+              <button type="submit" class="btn-cyber green" id="btn-save-ai-config" style="padding: 9px 24px; font-weight: bold;">
+                💾 SAVE AI CONFIG
+              </button>
+            </div>
+
+            <div id="ai-config-feedback" style="display: none; padding: 10px 14px; border-radius: 4px; font-size: 12px; letter-spacing: 0.5px;"></div>
+          </form>
+        </div>
+
+        <!-- Panel 2: Real-time Weather & Atmospheric Telemetry -->
+        <div class="table-panel" style="border: 1px solid rgba(0, 255, 136, 0.35); box-shadow: 0 0 20px rgba(0, 255, 136, 0.08);">
+          <div class="panel-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="display: inline-block; width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88;"></span>
+              <span class="panel-title" style="color: #00ff88; font-size: 14px;">ATMOSPHERIC & WEATHER RADAR</span>
+            </div>
+            <button class="btn-cyber" id="btn-refresh-weather" style="padding: 3px 10px; font-size: 11px;">REFRESH</button>
+          </div>
+
+          <div style="margin-bottom: 12px; font-size: 12px; color: #88bbdd; line-height: 1.5;">
+            Ultron automatically detects your location via IP or global queries to speak live weather, temperature, humidity, and winds.
+          </div>
+
+          <div style="background: rgba(0, 240, 255, 0.04); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 6px; padding: 14px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 11px; color: #5588aa; letter-spacing: 1px;">DETECTED LOCATION:</span>
+              <span style="font-size: 13px; color: #00f0ff; font-weight: bold;" id="weather-location-name">Detecting...</span>
+            </div>
+            <div style="font-size: 13px; color: #ffffff; line-height: 1.6;" id="weather-report-display">
+              Fetching live meteorological telemetry...
+            </div>
+          </div>
+
+          <form id="form-check-weather" onsubmit="return false;" style="display: flex; gap: 8px;">
+            <input type="text" id="input-weather-city" placeholder="Query any city (e.g. Tokyo, London, New York)..." autocomplete="off"
+                   style="flex: 1; padding: 9px 12px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 12px;">
+            <button type="submit" class="btn-cyber" id="btn-query-weather" style="white-space: nowrap;">
+              🔍 CHECK
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Live Interactive AI Neural Console -->
+      <div class="table-panel">
+        <div class="panel-header">
+          <span class="panel-title">DIRECT NEURAL COMM CHANNEL (CONVERSE FREELY)</span>
+          <span style="font-size: 11px; color: #5588aa;">FREE-FORM MULTI-TURN CONVERSATION</span>
+        </div>
+        <div id="ai-chat-history-box" style="background: rgba(4, 8, 14, 0.85); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 6px; padding: 14px; height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
+          <div style="color: #00ff88; font-size: 12px; line-height: 1.4;">
+            <strong>ULTRON:</strong> I am initialized and awaiting your transmission, boss. Talk to me freely about anything, ask what the weather is like, or tell me to control your desktop.
+          </div>
+        </div>
+        <form id="form-dashboard-chat" onsubmit="return false;" style="display: flex; gap: 8px;">
+          <input type="text" id="input-dashboard-chat" placeholder="Type anything to converse freely with Ultron (or speak via 'Hey Ultron')..." autocomplete="off"
+                 style="flex: 1; padding: 10px 14px; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.3); color: #fff; font-family: inherit; border-radius: 4px; font-size: 13px;">
+          <button type="submit" class="btn-cyber green" id="btn-dashboard-send" style="padding: 10px 24px; font-weight: bold;">
+            TRANSMIT ➤
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
+

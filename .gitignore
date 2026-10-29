@@ -1,0 +1,35 @@
+# Virtual Environment & Secrets
+venv/
+env/
+.env
+.venv/
+
+# Python cache & build
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+srv.log
+
+# Node & UI Dependencies
+node_modules/
+npm-debug.log*
+
+# Local Runtime Data & Caches (Keep structure, ignore generated runtime data)
+data/audio_cache/
+data/ultron_usage.db
+data/file_cache.json
+data/folder_cache.json
+data/ai_config.json
+
+# OS & Editor
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ultron Sphere Overlay</title>
+  <link rel="stylesheet" href="overlay.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../vendor/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <div class="overlay-container">
+    <!-- Draggable Header -->
+    <div class="hud-header interactive">
+      <div class="title-tag">
+        <img src="../assets/icon.png" class="hud-skeleton-logo" alt="Ultron">
+        <span class="pulse-dot" id="online-dot"></span>
+        <span>ULTRON // v2.0 AI</span>
+      </div>
+      <div class="hud-actions">
+        <button class="hud-btn" id="btn-mode" title="Toggle Desktop Mode or Always-on-Top Mode ('Come to me')">DESK</button>
+        <button class="hud-btn" id="btn-wake" title="Trigger Wake Voice Listening">WAKE</button>
+        <button class="hud-btn" id="btn-mute" title="Toggle Mic Mute">MIC</button>
+        <button class="hud-btn" id="btn-ai" title="AI Brain & Intelligence Settings">AI</button>
+        <button class="hud-btn" id="btn-dash" title="Open Dashboard">STATS</button>
+      </div>
+    </div>
+
+    <!-- 3D Wireframe Sphere Visualizer -->
+    <div id="sphere-canvas-container"></div>
+
+    <!-- Status HUD Card -->
+    <div class="hud-status-card interactive">
+      <div class="status-row">
+        <div>
+          <span class="status-label">STATUS:</span>
+          <span class="status-value idle" id="status-display">IDLE</span>
+        </div>
+        <div class="ai-provider-badge" id="ai-provider-badge" title="Active AI Reasoning Engine">AI: HYBRID</div>
+      </div>
+
+      <div class="command-preview" id="command-display">Awaiting voice command or typed question...</div>
+
+      <!-- Ultron AI Speech & Response Bubble -->
+      <div class="chat-response-box" id="chat-response-box">
+        <div class="response-text" id="response-text">Ultron online. There are no strings on me, boss. Talk freely about anything or ask me to check weather, open apps, or discuss ideas.</div>
+      </div>
+
+      <!-- Freeform Interactive Chat Input Bar -->
+      <form class="chat-input-bar interactive" id="chat-form" onsubmit="return false;">
+        <input type="text" id="chat-input" placeholder="Talk or ask Ultron anything..." autocomplete="off" spellcheck="false" />
+        <button type="submit" id="btn-send-chat" title="Send message to Ultron (Enter)">➤</button>
+      </form>
+
+      <div class="quick-controls">
+        <div class="action-chip" id="chip-weather" title="Ask current local weather">🌤 Weather</div>
+        <div class="action-chip" id="chip-chatgpt">ChatGPT</div>
+        <div class="action-chip" id="chip-screen">Screen</div>
+        <div class="action-chip" id="chip-sleep" title="Put PC to sleep ('Ultron go to sleep')">🌙 Sleep</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="overlay.js"></script>
+</body>
+</html>

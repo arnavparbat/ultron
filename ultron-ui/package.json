@@ -1,0 +1,18 @@
+﻿{
+  "name": "ultron-ui",
+  "version": "1.0.0",
+  "description": "Ultron Desktop AI Voice Assistant Overlay & Dashboard",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "chart.js": "^4.4.8",
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0"
+  },
+  "author": "Ultron AI",
+  "license": "MIT"
+}
